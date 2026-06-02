@@ -6,312 +6,228 @@
   <title>Interactief rad</title>
   <style>
     :root {
-      --green: #72df00;
-      --orange: #ff8a45;
-      --blue: #4c66f0;
+      --green: #67d900;
+      --orange: #ff914d;
+      --blue: #4f6df3;
+      --panel: #ffffff;
+      --text: #1f2937;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
-      min-height: 100svh;
+      min-height: 100vh;
       display: grid;
       place-items: center;
-      background: #f7f7f7;
+      background: #f4f6fb;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      color: #1d1d1d;
+      color: var(--text);
     }
 
     .app {
       width: min(1120px, 96vw);
       display: grid;
-      grid-template-columns: minmax(310px, 760px) 180px;
-      gap: clamp(20px, 4vw, 54px);
+      grid-template-columns: minmax(300px, 680px) 180px;
+      gap: 32px;
       align-items: center;
-      padding: 24px;
+      justify-content: center;
+      padding: 28px;
     }
 
-    .wheel-stage {
+    .wheel-card {
       position: relative;
-      width: min(760px, 88vw);
-      aspect-ratio: 1;
-      margin-inline: auto;
+      width: min(680px, 86vw);
+      aspect-ratio: 1 / 1;
+      display: grid;
+      place-items: center;
     }
 
-    .wheel-rotor {
-      position: absolute;
-      inset: 0;
-      transform-origin: 50% 50%;
-      transform: rotate(0deg);
-      transition: transform 3.8s cubic-bezier(.12,.72,.08,1);
-      filter: drop-shadow(0 16px 30px rgba(0,0,0,.18));
+    .wheel-wrap {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      overflow: hidden;
+      filter: drop-shadow(0 18px 30px rgba(0,0,0,.18));
     }
 
-    .wheel-image,
-    .emphasis-svg {
-      position: absolute;
-      inset: 0;
+    .wheel {
       width: 100%;
       height: 100%;
       display: block;
-    }
-
-    .wheel-image {
+      border-radius: 50%;
+      transform: rotate(0deg);
+      transition: transform 4s cubic-bezier(.12,.72,.12,1);
       user-select: none;
       -webkit-user-drag: none;
     }
 
-    .emphasis-svg {
-      pointer-events: none;
-      overflow: visible;
-    }
-
-    .fade-slice,
-    .active-ring {
-      opacity: 0;
-      transition: opacity .55s ease;
-    }
-
-    .wheel-rotor.settled .fade-slice.visible {
-      opacity: .56;
-    }
-
-    .wheel-rotor.settled .active-ring.visible {
-      opacity: 1;
-    }
-
-    .hub-shine {
+    /* Na het stoppen: het bovenste vak blijft helder, de twee andere vakken worden gedimd. */
+    .wheel-wrap.stopped::after {
+      content: "";
       position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 15%;
-      height: 15%;
-      transform: translate(-50%, -50%);
-      border-radius: 999px;
+      inset: 0;
+      border-radius: 50%;
       pointer-events: none;
-      box-shadow: 0 0 0 3px rgba(255,255,255,.35), 0 0 26px rgba(255,255,255,.45);
-      z-index: 3;
-      opacity: 0;
-      transition: opacity .55s ease;
+      background: conic-gradient(
+        from -60deg at 50% 50%,
+        rgba(255,255,255,0) 0deg 120deg,
+        rgba(255,255,255,.58) 120deg 360deg
+      );
     }
 
-    .wheel-rotor.settled + .hub-shine {
-      opacity: 1;
+    .wheel-wrap.stopped::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      pointer-events: none;
+      background: conic-gradient(
+        from -60deg at 50% 50%,
+        rgba(255,255,255,.38) 0deg 120deg,
+        rgba(255,255,255,0) 120deg 360deg
+      );
+      mix-blend-mode: screen;
     }
 
     .pointer {
       position: absolute;
-      z-index: 5;
-      top: -6px;
+      top: -5px;
       left: 50%;
       transform: translateX(-50%);
       width: 0;
       height: 0;
-      border-left: 25px solid transparent;
-      border-right: 25px solid transparent;
-      border-top: 0;
-      border-bottom: 46px solid #1f1f1f;
-      filter: drop-shadow(0 5px 4px rgba(0,0,0,.25));
+      border-left: 24px solid transparent;
+      border-right: 24px solid transparent;
+      border-top: 42px solid #111827;
+      z-index: 4;
+      filter: drop-shadow(0 5px 5px rgba(0,0,0,.25));
     }
 
-    .controls {
+    .buttons {
       display: grid;
       gap: 16px;
     }
 
     button {
+      min-height: 64px;
       border: 0;
-      border-radius: 22px;
-      padding: 20px 22px;
-      font-size: 1.08rem;
+      border-radius: 18px;
+      color: white;
+      font-size: 1.15rem;
       font-weight: 800;
       cursor: pointer;
-      box-shadow: 0 10px 24px rgba(0,0,0,.18);
-      transition: transform .15s ease, filter .15s ease, opacity .15s ease;
+      box-shadow: 0 10px 20px rgba(0,0,0,.18);
+      transition: transform .16s ease, filter .16s ease, opacity .16s ease;
     }
 
-    button:hover {
-      transform: translateY(-2px);
-      filter: brightness(1.04);
-    }
+    button:hover { transform: translateY(-2px); filter: brightness(1.04); }
+    button:active { transform: translateY(1px) scale(.99); }
+    button:disabled { cursor: wait; opacity: .7; transform: none; }
 
-    button:active {
-      transform: translateY(1px);
-    }
-
-    button:disabled {
-      cursor: wait;
-      opacity: .7;
-      transform: none;
-    }
-
-    .btn-green {
-      background: var(--green);
-      color: #174800;
-    }
-
-    .btn-orange {
-      background: var(--orange);
-      color: #fff;
-    }
-
-    .btn-blue {
-      background: var(--blue);
-      color: #fff;
-    }
+    .green { background: var(--green); }
+    .orange { background: var(--orange); }
+    .blue { background: var(--blue); }
 
     .status {
-      min-height: 1.4em;
-      margin: 10px 0 0;
+      grid-column: 1 / -1;
       text-align: center;
-      color: #555;
-      font-size: .95rem;
+      min-height: 1.5em;
+      font-weight: 700;
     }
 
-    @media (max-width: 820px) {
+    @media (max-width: 760px) {
       .app {
         grid-template-columns: 1fr;
         gap: 22px;
+        padding: 18px;
       }
 
-      .controls {
+      .buttons {
         grid-template-columns: repeat(3, 1fr);
       }
 
       button {
-        padding: 16px 10px;
-        border-radius: 18px;
+        min-height: 56px;
+        font-size: 1rem;
+        border-radius: 14px;
       }
     }
   </style>
 </head>
 <body>
   <main class="app">
-    <section class="wheel-stage" aria-label="Interactief rad">
+    <section class="wheel-card" aria-label="Interactief rad">
       <div class="pointer" aria-hidden="true"></div>
-
-      <div id="rotor" class="wheel-rotor">
-        <img class="wheel-image" src="assets/rad.png" alt="Rad met groene, oranje en blauwe vakken">
-
-        <!-- Deze SVG ligt exact over rad.png heen.
-             De witte vlakken maken de niet-gekozen sectoren transparanter.
-             De ring geeft het gekozen vak extra nadruk. -->
-        <svg class="emphasis-svg" viewBox="0 0 600 600" aria-hidden="true">
-          <defs>
-            <filter id="softGlow" x="-30%" y="-30%" width="160%" height="160%">
-              <feGaussianBlur stdDeviation="5" result="blur"/>
-              <feMerge>
-                <feMergeNode in="blur"/>
-                <feMergeNode in="SourceGraphic"/>
-              </feMerge>
-            </filter>
-          </defs>
-
-          <path class="fade-slice fade-green" data-color="green"
-                d="M300 300 L52.3 157 A286 286 0 0 1 547.7 157 Z"
-                fill="#ffffff"/>
-          <path class="fade-slice fade-blue" data-color="blue"
-                d="M300 300 L547.7 157 A286 286 0 0 1 300 586 Z"
-                fill="#ffffff"/>
-          <path class="fade-slice fade-orange" data-color="orange"
-                d="M300 300 L300 586 A286 286 0 0 1 52.3 157 Z"
-                fill="#ffffff"/>
-
-          <path class="active-ring ring-green" data-color="green"
-                d="M300 300 L52.3 157 A286 286 0 0 1 547.7 157 Z"
-                fill="none" stroke="#ffffff" stroke-width="15" filter="url(#softGlow)"/>
-          <path class="active-ring ring-blue" data-color="blue"
-                d="M300 300 L547.7 157 A286 286 0 0 1 300 586 Z"
-                fill="none" stroke="#ffffff" stroke-width="15" filter="url(#softGlow)"/>
-          <path class="active-ring ring-orange" data-color="orange"
-                d="M300 300 L300 586 A286 286 0 0 1 52.3 157 Z"
-                fill="none" stroke="#ffffff" stroke-width="15" filter="url(#softGlow)"/>
-        </svg>
+      <div class="wheel-wrap" id="wheelWrap">
+        <img class="wheel" id="wheel" src="assets/rad.png" alt="Rad met groene, oranje en blauwe vakken" />
       </div>
-
-      <div class="hub-shine" aria-hidden="true"></div>
     </section>
 
-    <aside>
-      <div class="controls" aria-label="Kies een kleur">
-        <button class="btn-green" data-target="green">Groen</button>
-        <button class="btn-orange" data-target="orange">Oranje</button>
-        <button class="btn-blue" data-target="blue">Blauw</button>
-      </div>
-      <p id="status" class="status" aria-live="polite"></p>
-    </aside>
+    <nav class="buttons" aria-label="Kies een kleur">
+      <button class="green" type="button" data-color="green">Groen</button>
+      <button class="orange" type="button" data-color="orange">Oranje</button>
+      <button class="blue" type="button" data-color="blue">Blauw</button>
+    </nav>
+
+    <div class="status" id="status" aria-live="polite"></div>
   </main>
 
   <script>
-    const rotor = document.querySelector("#rotor");
-    const buttons = document.querySelectorAll("button[data-target]");
-    const status = document.querySelector("#status");
+    const wheel = document.getElementById('wheel');
+    const wheelWrap = document.getElementById('wheelWrap');
+    const status = document.getElementById('status');
+    const buttons = [...document.querySelectorAll('button[data-color]')];
 
-    // Startpositie van rad.png:
-    // groen staat midden boven, blauw rechts onder, oranje links onder.
+    // Doelposities in graden.
+    // Het rad.png heeft groen al bovenaan. Oranje en blauw worden naar boven gedraaid.
     const targetRotation = {
       green: 0,
-      blue: -120,
-      orange: 120
+      orange: 120,
+      blue: 240
     };
 
-    const colorLabel = {
-      green: "groen",
-      blue: "blauw",
-      orange: "oranje"
+    const label = {
+      green: 'groen',
+      orange: 'oranje',
+      blue: 'blauw'
     };
 
     let currentRotation = 0;
     let isSpinning = false;
 
-    function highlight(color) {
-      document.querySelectorAll(".fade-slice").forEach(slice => {
-        slice.classList.toggle("visible", slice.dataset.color !== color);
-      });
-
-      document.querySelectorAll(".active-ring").forEach(ring => {
-        ring.classList.toggle("visible", ring.dataset.color === color);
-      });
-
-      rotor.classList.add("settled");
-      status.textContent = `Het rad staat op ${colorLabel[color]}.`;
+    function setButtonsDisabled(disabled) {
+      buttons.forEach(button => button.disabled = disabled);
     }
 
     function spinTo(color) {
       if (isSpinning) return;
 
       isSpinning = true;
-      rotor.classList.remove("settled");
-      status.textContent = "Het rad draait…";
-      buttons.forEach(button => button.disabled = true);
+      setButtonsDisabled(true);
+      wheelWrap.classList.remove('stopped');
+      status.textContent = 'Het rad draait...';
 
-      const baseTarget = targetRotation[color];
+      const fullTurns = 4 * 360;
+      const currentMod = ((currentRotation % 360) + 360) % 360;
+      const target = targetRotation[color];
+      const delta = (target - currentMod + 360) % 360;
 
-      const fullTurns = 4 + Math.floor(Math.random() * 2);
-      const normalizedCurrent = ((currentRotation % 360) + 360) % 360;
-      const normalizedTarget = ((baseTarget % 360) + 360) % 360;
-
-      let delta = normalizedTarget - normalizedCurrent;
-      if (delta < 0) delta += 360;
-
-      currentRotation += fullTurns * 360 + delta;
-      rotor.style.transform = `rotate(${currentRotation}deg)`;
+      currentRotation += fullTurns + delta;
+      wheel.style.transform = `rotate(${currentRotation}deg)`;
 
       window.setTimeout(() => {
-        highlight(color);
-        buttons.forEach(button => button.disabled = false);
+        wheelWrap.classList.add('stopped');
+        status.textContent = `Het rad staat op ${label[color]}.`;
         isSpinning = false;
-      }, 3900);
+        setButtonsDisabled(false);
+      }, 4100);
     }
 
     buttons.forEach(button => {
-      button.addEventListener("click", () => spinTo(button.dataset.target));
+      button.addEventListener('click', () => spinTo(button.dataset.color));
     });
-
-    highlight("green");
   </script>
 </body>
 </html>
