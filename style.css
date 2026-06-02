@@ -1,0 +1,47 @@
+const wheel = document.querySelector('#wheel');
+const buttons = [...document.querySelectorAll('.color-button')];
+
+// Het rad heeft drie gelijke vakken.
+// CSS-rotatie is met de klok mee:
+// groen staat al bovenaan, oranje komt bovenaan bij 120 graden, blauw bij 240 graden.
+const targetRotation = {
+  green: 0,
+  orange: 120,
+  blue: 240,
+};
+
+let currentRotation = 0;
+let isSpinning = false;
+
+function normalizedDegrees(value) {
+  return ((value % 360) + 360) % 360;
+}
+
+function spinTo(color) {
+  if (isSpinning) return;
+
+  const target = targetRotation[color];
+  if (target === undefined) return;
+
+  isSpinning = true;
+  buttons.forEach((button) => button.disabled = true);
+
+  const current = normalizedDegrees(currentRotation);
+  const distanceToTarget = (target - current + 360) % 360;
+
+  // Vier volle rondes plus exact eindigen op het midden van de gekozen kleur.
+  // Daardoor staat bovenaan één kleur, niet een scheidslijn tussen twee kleuren.
+  currentRotation += 1440 + distanceToTarget;
+
+  wheel.style.transition = 'transform 2400ms cubic-bezier(.12,.72,.15,1)';
+  wheel.style.transform = `rotate(${currentRotation}deg)`;
+
+  window.setTimeout(() => {
+    isSpinning = false;
+    buttons.forEach((button) => button.disabled = false);
+  }, 2450);
+}
+
+buttons.forEach((button) => {
+  button.addEventListener('click', () => spinTo(button.dataset.color));
+});
