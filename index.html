@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Interactief rad</title>
+
   <style>
     * {
       box-sizing: border-box;
@@ -85,13 +86,54 @@
       animation: twinkle 1.8s infinite ease-in-out;
     }
 
-    .sparkle.s1 { left: 48%; top: 7%;  font-size: 30px; animation-delay: 0s; }
-    .sparkle.s2 { left: 33%; top: 16%; font-size: 18px; animation-delay: 0.25s; }
-    .sparkle.s3 { left: 63%; top: 18%; font-size: 20px; animation-delay: 0.5s; }
-    .sparkle.s4 { left: 24%; top: 25%; font-size: 14px; animation-delay: 0.8s; }
-    .sparkle.s5 { left: 71%; top: 24%; font-size: 16px; animation-delay: 1.1s; }
-    .sparkle.s6 { left: 43%; top: 22%; font-size: 16px; animation-delay: 1.35s; }
-    .sparkle.s7 { left: 56%; top: 27%; font-size: 14px; animation-delay: 1.55s; }
+    .sparkle.s1 {
+      left: 48%;
+      top: 7%;
+      font-size: 30px;
+      animation-delay: 0s;
+    }
+
+    .sparkle.s2 {
+      left: 33%;
+      top: 16%;
+      font-size: 18px;
+      animation-delay: 0.25s;
+    }
+
+    .sparkle.s3 {
+      left: 63%;
+      top: 18%;
+      font-size: 20px;
+      animation-delay: 0.5s;
+    }
+
+    .sparkle.s4 {
+      left: 24%;
+      top: 25%;
+      font-size: 14px;
+      animation-delay: 0.8s;
+    }
+
+    .sparkle.s5 {
+      left: 71%;
+      top: 24%;
+      font-size: 16px;
+      animation-delay: 1.1s;
+    }
+
+    .sparkle.s6 {
+      left: 43%;
+      top: 22%;
+      font-size: 16px;
+      animation-delay: 1.35s;
+    }
+
+    .sparkle.s7 {
+      left: 56%;
+      top: 27%;
+      font-size: 14px;
+      animation-delay: 1.55s;
+    }
 
     .spark-dot {
       position: absolute;
@@ -105,15 +147,30 @@
       animation: pulseDot 1.7s infinite ease-in-out;
     }
 
-    .spark-dot.d1 { left: 40%; top: 14%; animation-delay: 0.15s; }
-    .spark-dot.d2 { left: 60%; top: 13%; animation-delay: 0.65s; }
-    .spark-dot.d3 { left: 52%; top: 20%; animation-delay: 1.05s; }
+    .spark-dot.d1 {
+      left: 40%;
+      top: 14%;
+      animation-delay: 0.15s;
+    }
+
+    .spark-dot.d2 {
+      left: 60%;
+      top: 13%;
+      animation-delay: 0.65s;
+    }
+
+    .spark-dot.d3 {
+      left: 52%;
+      top: 20%;
+      animation-delay: 1.05s;
+    }
 
     @keyframes twinkle {
       0%, 100% {
         opacity: 0.2;
         transform: scale(0.6) rotate(0deg);
       }
+
       50% {
         opacity: 1;
         transform: scale(1.18) rotate(18deg);
@@ -125,6 +182,7 @@
         opacity: 0.15;
         transform: scale(0.5);
       }
+
       50% {
         opacity: 1;
         transform: scale(1.3);
@@ -169,16 +227,20 @@
     }
 
     .spin-btn {
-      min-width: 150px;
+      width: 300px;
+      min-height: 96px;
       border: none;
-      border-radius: 16px;
-      padding: 16px 20px;
-      font-size: 20px;
-      font-weight: 700;
+      border-radius: 18px;
+      padding: 14px 18px;
       color: white;
       cursor: pointer;
       box-shadow: 0 8px 18px rgba(0,0,0,0.14);
       transition: transform 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 5px;
     }
 
     .spin-btn:hover {
@@ -193,6 +255,19 @@
     .spin-btn:disabled {
       opacity: 0.65;
       cursor: not-allowed;
+    }
+
+    .btn-title {
+      font-size: 25px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .btn-explain {
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 1.2;
+      opacity: 0.96;
     }
 
     .btn-green {
@@ -213,17 +288,18 @@
       }
 
       .controls {
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: center;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
       }
 
       .spin-btn {
-        min-width: 130px;
+        width: min(92vw, 360px);
       }
     }
   </style>
 </head>
+
 <body>
   <div class="app">
     <div class="wheel-wrap">
@@ -251,9 +327,20 @@
     </div>
 
     <div class="controls">
-      <button class="spin-btn btn-green" data-target="green">cijfer</button>
-      <button class="spin-btn btn-blue" data-target="blue">letter</button>
-      <button class="spin-btn btn-orange" data-target="orange">woord</button>
+      <button class="spin-btn btn-green" data-target="green">
+        <span class="btn-title">cijfer</span>
+        <span class="btn-explain">een teken dat laat zien hoeveel het er zijn</span>
+      </button>
+
+      <button class="spin-btn btn-blue" data-target="blue">
+        <span class="btn-title">letter</span>
+        <span class="btn-explain">een teken waarmee je woorden kunt bouwen</span>
+      </button>
+
+      <button class="spin-btn btn-orange" data-target="orange">
+        <span class="btn-title">woord</span>
+        <span class="btn-explain">bestaat uit letters, een woord maakt een plaatje in je hoofd</span>
+      </button>
     </div>
   </div>
 
@@ -276,7 +363,9 @@
     }
 
     function setButtonsDisabled(disabled) {
-      buttons.forEach(btn => btn.disabled = disabled);
+      buttons.forEach(button => {
+        button.disabled = disabled;
+      });
     }
 
     function spinTo(targetColor) {
